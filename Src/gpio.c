@@ -120,4 +120,20 @@ void GPIO_deInit(GPIO_Config_t* pConfig){
   free(pConfig);
 }
 
+void GPIO_ConfigUSART2(void) {
+    enableClock(GPIO_A);
+
+    volatile uint32_t* gpioBase = getGpioBase(GPIO_A);
+
+    // PA2 (TX) → Alternate function push-pull, output mode 2MHz (MODE=10, CNF=10)
+    volatile uint32_t* crl = gpioBase + (GPIO_CRL_OFFSET / 4);
+    *crl &= ~(0xF << (2 * 4));             // Clear bits for PA2
+    *crl |=  ((0xA) << (2 * 4));           // Set MODE=10, CNF=10
+
+    // PA3 (RX) → Input floating (MODE=00, CNF=01)
+    *crl &= ~(0xF << (3 * 4));             // Clear bits for PA3
+    *crl |=  ((0x4) << (3 * 4));           // Set MODE=00, CNF=01
+}
+
+
 

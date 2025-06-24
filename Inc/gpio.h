@@ -65,5 +65,5 @@ GPIO_Config_t* GPIO_Init(GPIO_e gpioTag, uint8_t pinNumber, GpioState_e gpioStat
 void GPIO_Write(GPIO_Config_t* pConfig, GpioState_e state);
 void GPIO_Delay(uint32_t count);
 void GPIO_deInit(GPIO_Config_t* pConfig);
-
+void GPIO_ConfigUSART2(void);
 #endif /* GPIO_H_ */
