@@ -1,0 +1,36 @@
+/*
+ * base.h
+ *
+ *  Created on: Jun 13, 2025
+ *      Author: chait
+ */
+
+#ifndef BASE_H_
+#define BASE_H_
+
+#include <stdint.h>
+
+#define PERIPHERAL_BASE              (0x40000000UL)
+
+#define APB1_PERIPHERAL_OFFSET       (0x00000000UL)
+#define APB1_PERIPHERAL              (PERIPHERAL_BASE + APB1_PERIPHERAL_OFFSET)
+
+#define APB2_PERIPHERAL_OFFSET       (0x00010000UL)
+#define APB2_PERIPHERAL              (PERIPHERAL_BASE + APB2_PERIPHERAL_OFFSET)
+
+#define AHB_PERIPHERAL_OFFSET        (0x00020000UL)
+#define AHB_PERIPHERAL               (PERIPHERAL_BASE + AHB_PERIPHERAL_OFFSET)
+
+#define GPIOA_PERIPHERAL_OFFSET      (0x00000800UL)
+#define GPIOA_PERIPHERAL             ((volatile uint32_t*)(APB2_PERIPHERAL + GPIOA_PERIPHERAL_OFFSET))
+
+#define GPIOB_PERIPHERAL_OFFSET      (0x00000C00UL)
+#define GPIOB_PERIPHERAL             ((volatile uint32_t*)(APB2_PERIPHERAL + GPIOB_PERIPHERAL_OFFSET))
+
+#define GPIOC_PERIPHERAL_OFFSET      (0x00001000UL)
+#define GPIOC_PERIPHERAL             ((volatile uint32_t*)(APB2_PERIPHERAL + GPIOC_PERIPHERAL_OFFSET))
+
+#define RCC_PERIPHERAL_OFFSET        (0x00001000UL)
+#define RCC_PERIPHERAL               (AHB_PERIPHERAL + RCC_PERIPHERAL_OFFSET)
+
+#endif /* BASE_H_ */

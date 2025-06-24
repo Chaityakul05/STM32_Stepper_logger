@@ -1,0 +1,21 @@
+# Build outputs
+/Debug/
+*.o
+*.d
+*.elf
+*.bin
+*.hex
+*.map
+
+# Eclipse files
+.project
+.cproject
+.settings/
+*.launch
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Backup files
+*~
