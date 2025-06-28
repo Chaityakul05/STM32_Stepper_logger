@@ -40,6 +40,7 @@
 void usart2_init(void);
 void usart2_write(uint8_t data);
 uint8_t usart2_read(void);
+void usart2_printf(const char *fmt, ...);
 void usart_set_baudrate(uint32_t peripheral_clock, uint32_t baudrate);
 
 #endif /* USART_H_ */

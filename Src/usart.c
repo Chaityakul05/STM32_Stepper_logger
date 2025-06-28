@@ -7,6 +7,8 @@
 #include "usart.h"
 #include "gpio.h"
 #include <stdint.h>
+#include <stdarg.h>
+#include <stdio.h>
 
 #define SYS_FREQ         16000000
 #define PERIPHERAL_CLOCK SYS_FREQ
@@ -49,5 +51,19 @@ uint8_t usart2_read(void)
 void usart_set_baudrate(uint32_t peripheral_clock, uint32_t baudrate)
 {
   USART2_BRR = ((peripheral_clock + (baudrate/2)) / baudrate);
+}
+
+void usart2_printf(const char *fmt, ...)
+{
+  char buffer[128];  // You can adjust size
+  va_list args;
+  va_start(args, fmt);
+  vsnprintf(buffer, sizeof(buffer), fmt, args);  // Format string
+  va_end(args);
+
+  for (int i = 0; buffer[i] != '\0'; i++)
+  {
+    usart2_write((uint8_t)buffer[i]);
+  }
 }
 

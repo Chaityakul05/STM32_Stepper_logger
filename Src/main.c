@@ -18,19 +18,32 @@
 
 #include <stdint.h>
 #include "gpio.h"
+#include "StepperMotor.h"
+#include "HC_SR04.h"
+#include "usart.h"
 
 int main(void)
 {
-  /* Loop forever */
-  GPIO_Config_t *led = GPIO_Init(GPIO_A, 5, OUTPUT, GPIO_RESET);
+  usart2_init();
+  usart2_printf("Stepper + Ultrasonic Logger Start\n");
 
+  StepperMotor_Config_t* motor = StepperMotor_Init(GPIO_B, 0, 1, 10, 11, 5);
+  HC_SR04_Config_t* sensor = HC_SR04_Init(GPIO_A, 8, 9);
 
-  for (;;)
+  const int steps = 100;
+
+  for (int i = 0; i < steps; i++)
   {
-     GPIO_Write(led, GPIO_SET);
-     GPIO_Delay(100000);
-     GPIO_Write(led, GPIO_RESET);
-     GPIO_Delay(100000);
+    StepperMotor_StepForward(motor, 1);
+    GPIO_Delay(20000);
+
+    float distance = getDistanceCm(sensor);
+    usart2_printf("Step %d: %.2f cm\n", i, distance);
   }
+
+  StepperMotor_deInit(motor);
+  HC_SR04_deInit(sensor);
+
+  while (1);
 }
 
