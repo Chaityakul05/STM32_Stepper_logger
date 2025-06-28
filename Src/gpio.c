@@ -17,6 +17,7 @@ struct GPIO_Config_tag
 {
   GPIO_e gpioTag;
   uint8_t gpioPin;
+  GpioMode_e gpioMode;
   GpioState_e gpioState;
 };
 
@@ -44,7 +45,7 @@ static void enableClock(GPIO_e gpioTag)
 
 static void setGpioState(GPIO_Config_t *pConfig)
 {
-  enableClock(pConfig->gpioTag);
+
   volatile uint32_t* gpioBase = getGpioBase(pConfig->gpioTag);
 
   volatile uint32_t* BSRR = gpioBase + (GPIO_BSRR_OFFSET / 4);
@@ -78,20 +79,41 @@ static void configGpioPin(GPIO_Config_t *pConfig)
   }
 
   *configReg &= ~(0xF << (pin * 4));
-  *configReg |=  (0x2 << (pin * 4));
+
+  if(pConfig->gpioMode == OUTPUT)
+  {
+    *configReg |=  (0x2 << (pin * 4));
+  }
+  else if(pConfig->gpioMode == INPUT)
+  {
+    *configReg |= (0x4 << (pin * 4));
+  }
+
 
 }
 
 /*----------------Accessible_functions----------------------*/
 
-GPIO_Config_t *GPIO_Init(GPIO_e gpioTags, uint8_t pinNumber, GpioState_e gpioStates)
+GPIO_Config_t *GPIO_Init(GPIO_e gpioTags, uint8_t pinNumber, GpioMode_e gpioMode, GpioState_e gpioStates)
 {
   GPIO_Config_t *pConfig = malloc(sizeof(GPIO_Config_t));
   pConfig->gpioTag   = gpioTags;
   pConfig->gpioPin   = pinNumber;
+  pConfig->gpioMode  = gpioMode;
   pConfig->gpioState = gpioStates;
-  setGpioState(pConfig);
-  configGpioPin(pConfig);
+
+  enableClock(pConfig->gpioTag);
+
+  if(pConfig->gpioMode == OUTPUT)
+  {
+    setGpioState(pConfig);
+    configGpioPin(pConfig);
+  }
+  else
+  {
+    configGpioPin(pConfig);
+  }
+
   return pConfig;
 }
 
@@ -107,6 +129,21 @@ void GPIO_Write(GPIO_Config_t* pConfig, GpioState_e state)
   else
   {
     *BSRR = (1 << (pConfig->gpioPin + 16));
+  }
+}
+
+GpioState_e GPIO_Read(GPIO_Config_t* pConfig)
+{
+  volatile uint32_t* gpioBase = getGpioBase(pConfig->gpioTag);
+  volatile uint32_t* IDR      = gpioBase + (GPIO_IDR_OFFSET / 4);
+
+  if((*IDR) & (1 << pConfig->gpioPin))
+  {
+    return GPIO_SET;
+  }
+  else
+  {
+    return GPIO_RESET;
   }
 }
 

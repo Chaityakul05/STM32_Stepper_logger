@@ -22,7 +22,8 @@
 int main(void)
 {
   /* Loop forever */
-  GPIO_Config_t *led = GPIO_Init(GPIO_A, 5, GPIO_RESET);
+  GPIO_Config_t *led = GPIO_Init(GPIO_A, 5, OUTPUT, GPIO_RESET);
+
 
   for (;;)
   {
