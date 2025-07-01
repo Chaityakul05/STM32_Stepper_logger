@@ -35,13 +35,18 @@ static volatile uint32_t* getGpioBase(GPIO_e gpioTag)
 
 static void enableClock(GPIO_e gpioTag)
 {
-  switch(gpioTag)
-  {
-  case GPIO_A: RCC_APB2ENR |= (1U << 2); break;
-  case GPIO_B: RCC_APB2ENR |= (1U << 3); break;
-  case GPIO_C: RCC_APB2ENR |= (1U << 4); break;
-  }
+    //volatile uint32_t* rcc_apb2enr_ptr = (uint32_t*)(RCC_PERIPHERAL + 0x18);
+
+    switch(gpioTag)
+    {
+        case GPIO_A: RCC_APB2ENR |= (1U << 2); break;
+        case GPIO_B: RCC_APB2ENR |= (1U << 3); break;
+        case GPIO_C: RCC_APB2ENR |= (1U << 4); break;
+    }
+
 }
+
+
 
 static void setGpioState(GPIO_Config_t *pConfig)
 {

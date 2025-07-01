@@ -27,10 +27,10 @@ int main(void)
   usart2_init();
   usart2_printf("Stepper + Ultrasonic Logger Start\n");
 
-  StepperMotor_Config_t* motor = StepperMotor_Init(GPIO_B, 0, 1, 10, 11, 5);
+  StepperMotor_Config_t* motor = StepperMotor_Init(GPIO_B, 0, 1, 10, 11, 10);
   HC_SR04_Config_t* sensor = HC_SR04_Init(GPIO_A, 8, 9);
 
-  const int steps = 100;
+  const int steps = 10;
 
   for (int i = 0; i < steps; i++)
   {

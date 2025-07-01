@@ -24,13 +24,18 @@ struct StepperMotor_Config_tag
 /*--------------Static Functions------------------*/
 static void stepSequence(StepperMotor_Config_t* motor, uint8_t step)
 {
-  static const uint8_t sequence[4][4] =
+  static const uint8_t sequence[8][4] =
   {
-     {1, 0, 0, 1},
-     {1, 0, 0, 0},
-     {1, 1, 0, 0},
-     {0, 1, 0, 0}
+    {1, 0, 0, 0},
+    {1, 1, 0, 0},
+    {0, 1, 0, 0},
+    {0, 1, 1, 0},
+    {0, 0, 1, 0},
+    {0, 0, 1, 1},
+    {0, 0, 0, 1},
+    {1, 0, 0, 1}
   };
+
 
     GPIO_Write(motor->pin1, sequence[step][0]);
     GPIO_Write(motor->pin2, sequence[step][1]);
@@ -57,19 +62,20 @@ void StepperMotor_StepForward(StepperMotor_Config_t* motor, uint16_t steps)
 {
   for (uint16_t i = 0; i < steps; i++)
   {
-    for (uint8_t s = 0; s < 4; s++)
+    for (uint8_t s = 0; s < 8; s++)
     {
-       stepSequence(motor, s);
-       GPIO_Delay(motor->stepDelay * 100);  // Adjust if needed
+      stepSequence(motor, s);
+      GPIO_Delay(motor->stepDelay * 100);  // adjust delay as needed
     }
   }
+
 }
 
 void StepperMotor_StepBackward(StepperMotor_Config_t* motor, uint16_t steps)
 {
   for (uint16_t i = 0; i < steps; i++)
   {
-    for (int8_t s = 3; s >= 0; s--)
+    for (int8_t s = 7; s >= 0; s--)
     {
       stepSequence(motor, s);
       GPIO_Delay(motor->stepDelay * 100);

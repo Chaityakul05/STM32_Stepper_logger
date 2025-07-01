@@ -5,6 +5,13 @@
  *      Author: chait
  */
 
+/*
+ * base.h
+ *
+ *  Created on: Jun 13, 2025
+ *      Author: chait
+ */
+
 #ifndef BASE_H_
 #define BASE_H_
 
@@ -37,3 +44,5 @@
 #define RCC_PERIPHERAL               (AHB_PERIPHERAL + RCC_PERIPHERAL_OFFSET)
 
 #endif /* BASE_H_ */
+
+
