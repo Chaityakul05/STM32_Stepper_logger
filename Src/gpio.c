@@ -91,7 +91,9 @@ static void configGpioPin(GPIO_Config_t *pConfig)
   }
   else if(pConfig->gpioMode == INPUT)
   {
-    *configReg |= (0x4 << (pin * 4));
+    *configReg |= (0x8 << (pin * 4));
+    volatile uint32_t* ODR = gpioBase + (GPIO_ODR_OFFSET / 4);
+    *ODR &= ~(1 << (pConfig->gpioPin));  // pull-down
   }
 
 
@@ -165,16 +167,11 @@ void GPIO_deInit(GPIO_Config_t* pConfig){
 void GPIO_ConfigUSART2(void) {
     enableClock(GPIO_A);
 
-    volatile uint32_t* gpioBase = getGpioBase(GPIO_A);
+    GPIOA_CRL &= ~(0xF << (2 * 4)); // Clear PA2
+    GPIOA_CRL |=  (0xA << (2 * 4)); // Set PA2 as AF push-pull
 
-    // PA2 (TX) → Alternate function push-pull, output mode 2MHz (MODE=10, CNF=10)
-    volatile uint32_t* crl = gpioBase + (GPIO_CRL_OFFSET / 4);
-    *crl &= ~(0xF << (2 * 4));             // Clear bits for PA2
-    *crl |=  ((0xA) << (2 * 4));           // Set MODE=10, CNF=10
-
-    // PA3 (RX) → Input floating (MODE=00, CNF=01)
-    *crl &= ~(0xF << (3 * 4));             // Clear bits for PA3
-    *crl |=  ((0x4) << (3 * 4));           // Set MODE=00, CNF=01
+    GPIOA_CRL &= ~(0xF << (3 * 4)); // Clear PA3
+    GPIOA_CRL |=  (0x4 << (3 * 4)); // Set PA3 as floating input
 }
 
 

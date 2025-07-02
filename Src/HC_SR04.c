@@ -8,6 +8,7 @@
 #include "base.h"
 #include "gpio.h"
 #include "HC_SR04.h"
+#include "tim_delay.h"
 #include <stdint.h>
 #include <stdlib.h>
 
@@ -34,61 +35,58 @@ HC_SR04_Config_t* HC_SR04_Init(GPIO_e gpio_base, uint8_t trigger_pin, uint8_t ec
 
 uint32_t measureEchoTime(HC_SR04_Config_t* psensorConfig)
 {
-  GPIO_Config_t* trigger_pin = GPIO_Init(psensorConfig->gpioBase, psensorConfig->triggerPin, OUTPUT, GPIO_RESET);
-  GPIO_Config_t* echo_pin    = GPIO_Init(psensorConfig->gpioBase, psensorConfig->echoPin, INPUT, GPIO_RESET);
+    GPIO_Config_t* trigger_pin = GPIO_Init(psensorConfig->gpioBase, psensorConfig->triggerPin, OUTPUT, GPIO_RESET);
+    GPIO_Config_t* echo_pin    = GPIO_Init(psensorConfig->gpioBase, psensorConfig->echoPin, INPUT, GPIO_RESET);
+    TIM2_Delay_Init();
 
-  GPIO_Write(trigger_pin, GPIO_RESET);
-  GPIO_Delay(2);
+    // Send 10us pulse to trigger
+    GPIO_Write(trigger_pin, GPIO_RESET);
+    TIM2_Delay_us(2);
 
-  GPIO_Write(trigger_pin, GPIO_SET);
-  GPIO_Delay(10);  // ~10 us
-  GPIO_Write(trigger_pin, GPIO_RESET);
+    GPIO_Write(trigger_pin, GPIO_SET);
+    TIM2_Delay_us(10);  // 10 us pulse
+    GPIO_Write(trigger_pin, GPIO_RESET);
 
-  uint32_t timeout = 30000; // arbitrary timeout to avoid infinite loop
-  while (!GPIO_Read(echo_pin))
-  {
-    if (--timeout == 0)
-    {
-      GPIO_deInit(trigger_pin);
-      GPIO_deInit(echo_pin);
-      return -1;  // timeout
+    uint32_t timeout = 30000;
+    while (!GPIO_Read(echo_pin)) {
+        if (--timeout == 0) {
+            GPIO_deInit(trigger_pin);
+            GPIO_deInit(echo_pin);
+            return 0xFFFFFFFF; // timeout error
+        }
     }
-  }
 
-  uint32_t echo_time = 0;
-  timeout = 30000;
-  while (GPIO_Read(echo_pin))
-  {
-    echo_time++;
-    GPIO_Delay(1);  // ~1us delay, adjust if needed
-    if (--timeout == 0)
-    {
-      // safety timeout
-      GPIO_deInit(trigger_pin);
-      GPIO_deInit(echo_pin);
-      break;
+    // Start measuring using timer counter
+    TIM2_CNT = 0;
+    while (GPIO_Read(echo_pin)) {
+        if (TIM2_CNT > 30000) {  // 30ms timeout
+            GPIO_deInit(trigger_pin);
+            GPIO_deInit(echo_pin);
+            return 0xFFFFFFFF;
+        }
     }
-  }
 
-  GPIO_deInit(trigger_pin);
-  GPIO_deInit(echo_pin);
+    uint32_t echo_time_us = TIM2_CNT;
 
-  return echo_time;
+    GPIO_deInit(trigger_pin);
+    GPIO_deInit(echo_pin);
 
+    return echo_time_us;  // in microseconds
 }
 
 
 float getDistanceCm(HC_SR04_Config_t* psensorConfig)
 {
-  int32_t echoTime = measureEchoTime(psensorConfig);
-  if (echoTime < 0)
-  {
-    return -1.0f; // timeout or error
-  }
-
-  float distance_cm = (echoTime * 0.0343f) / 2.0f; // divide by 2 for round trip
-  return distance_cm;
+    uint32_t echoTime = measureEchoTime(psensorConfig);
+    if (echoTime == 0xFFFFFFFF)
+    {
+        return -1.0f;
+    }
+    // Speed of sound = 343 m/s = 0.0343 cm/us
+    float distance_cm = (echoTime * 0.0343f) / 2.0f;
+    return distance_cm;
 }
+
 
 
 void HC_SR04_deInit(HC_SR04_Config_t* psensorConfig)

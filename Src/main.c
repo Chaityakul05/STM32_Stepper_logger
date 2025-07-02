@@ -22,26 +22,43 @@
 #include "HC_SR04.h"
 #include "usart.h"
 
+//int main(void)
+//{
+    //usart2_init();
+
+    //while (1)
+    //{
+        //usart2_write('H');
+        //GPIO_Delay(100000);
+        //usart2_write('I');
+        //GPIO_Delay(100000);
+    //}
+//}
+
+
 int main(void)
 {
+  //GPIO_Config_t* check = GPIO_Init(GPIO_A, 3, INPUT, GPIO_RESET);
+  //GPIO_Write(check, GPIO_SET);
   usart2_init();
   usart2_printf("Stepper + Ultrasonic Logger Start\n");
 
-  StepperMotor_Config_t* motor = StepperMotor_Init(GPIO_B, 0, 1, 10, 11, 10);
-  HC_SR04_Config_t* sensor = HC_SR04_Init(GPIO_A, 8, 9);
+  //StepperMotor_Config_t* motor = StepperMotor_Init(GPIO_B, 0, 1, 10, 11, 10);
+  HC_SR04_Config_t* sensor = HC_SR04_Init(GPIO_A, 10, 11);
 
   const int steps = 10;
 
   for (int i = 0; i < steps; i++)
   {
-    StepperMotor_StepForward(motor, 1);
-    GPIO_Delay(20000);
+    //StepperMotor_StepForward(motor, 1);
+    //GPIO_Delay(20000);
 
     float distance = getDistanceCm(sensor);
     usart2_printf("Step %d: %.2f cm\n", i, distance);
+    GPIO_Delay(100000);
   }
 
-  StepperMotor_deInit(motor);
+  //StepperMotor_deInit(motor);
   HC_SR04_deInit(sensor);
 
   while (1);

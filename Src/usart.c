@@ -10,7 +10,7 @@
 #include <stdarg.h>
 #include <stdio.h>
 
-#define SYS_FREQ         16000000
+#define SYS_FREQ         8000000
 #define PERIPHERAL_CLOCK SYS_FREQ
 #define BAUD_RATE        115200
 
