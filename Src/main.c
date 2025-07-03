@@ -21,6 +21,7 @@
 #include "StepperMotor.h"
 #include "HC_SR04.h"
 #include "usart.h"
+#include "tim_delay.h"
 
 //int main(void)
 //{
@@ -38,13 +39,13 @@
 
 int main(void)
 {
-  //GPIO_Config_t* check = GPIO_Init(GPIO_A, 3, INPUT, GPIO_RESET);
+  //GPIO_Config_t* check = GPIO_Init(GPIO_A, 7, INPUT, GPIO_RESET);
   //GPIO_Write(check, GPIO_SET);
   usart2_init();
   usart2_printf("Stepper + Ultrasonic Logger Start\n");
 
   //StepperMotor_Config_t* motor = StepperMotor_Init(GPIO_B, 0, 1, 10, 11, 10);
-  HC_SR04_Config_t* sensor = HC_SR04_Init(GPIO_A, 10, 11);
+  HC_SR04_Config_t* sensor = HC_SR04_Init(GPIO_B, 8, 9);
 
   const int steps = 10;
 
@@ -62,5 +63,18 @@ int main(void)
   HC_SR04_deInit(sensor);
 
   while (1);
+
+  //{
+    //if(GPIO_Read(check) == GPIO_SET)
+    //{
+      //usart2_printf("The input is high\n");
+      //GPIO_Delay(10000);
+    //}
+    //else
+    //{
+      //usart2_printf("The input is low\n");
+      //GPIO_Delay(10000);
+    //}
+  //}
 }
 

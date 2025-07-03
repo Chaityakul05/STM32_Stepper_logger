@@ -23,6 +23,8 @@ void TIM2_Delay_Init(void)
     // Optional: Max ARR value (not used in blocking delay)
     TIM2_ARR = 0xFFFF;
 
+    TIM2_EGR |= (1 << 0);
+
     // Clear counter
     TIM2_CNT = 0;
 
@@ -32,6 +34,8 @@ void TIM2_Delay_Init(void)
 
 void TIM2_Delay_us(uint32_t us)
 {
-    TIM2_CNT = 0;
-    while (TIM2_CNT < us);
+  TIM2_CR1 &= ~TIM_CR1_CEN;
+  TIM2_CNT = 0;
+  TIM2_CR1 |= TIM_CR1_CEN;
+  while (TIM2_CNT < us);
 }

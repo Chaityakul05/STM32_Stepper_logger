@@ -17,6 +17,8 @@ struct HC_SR04_Config_tag
   GPIO_e gpioBase;
   uint8_t triggerPin;
   uint8_t echoPin;
+  GPIO_Config_t* trigger_pin;
+  GPIO_Config_t* echo_pin;
 };
 
 
@@ -26,50 +28,48 @@ struct HC_SR04_Config_tag
 HC_SR04_Config_t* HC_SR04_Init(GPIO_e gpio_base, uint8_t trigger_pin, uint8_t echo_pin)
 {
   HC_SR04_Config_t* psensorConfig = malloc(sizeof(HC_SR04_Config_t));
-  psensorConfig->gpioBase   = gpio_base;
-  psensorConfig->triggerPin = trigger_pin;
-  psensorConfig->echoPin    = echo_pin;
+  psensorConfig->gpioBase    = gpio_base;
+  psensorConfig->triggerPin  = trigger_pin;
+  psensorConfig->echoPin     = echo_pin;
+  psensorConfig->trigger_pin =  GPIO_Init(psensorConfig->gpioBase, psensorConfig->triggerPin, OUTPUT, GPIO_RESET);
+  psensorConfig->echo_pin    =  GPIO_Init(psensorConfig->gpioBase, psensorConfig->echoPin, INPUT, GPIO_RESET);
   return psensorConfig;
 }
 
 
 uint32_t measureEchoTime(HC_SR04_Config_t* psensorConfig)
 {
-    GPIO_Config_t* trigger_pin = GPIO_Init(psensorConfig->gpioBase, psensorConfig->triggerPin, OUTPUT, GPIO_RESET);
-    GPIO_Config_t* echo_pin    = GPIO_Init(psensorConfig->gpioBase, psensorConfig->echoPin, INPUT, GPIO_RESET);
+
     TIM2_Delay_Init();
 
     // Send 10us pulse to trigger
-    GPIO_Write(trigger_pin, GPIO_RESET);
+    GPIO_Write(psensorConfig->trigger_pin, GPIO_RESET);
     TIM2_Delay_us(2);
 
-    GPIO_Write(trigger_pin, GPIO_SET);
+    GPIO_Write(psensorConfig->trigger_pin, GPIO_SET);
     TIM2_Delay_us(10);  // 10 us pulse
-    GPIO_Write(trigger_pin, GPIO_RESET);
+    GPIO_Write(psensorConfig->trigger_pin, GPIO_RESET);
 
     uint32_t timeout = 30000;
-    while (!GPIO_Read(echo_pin)) {
-        if (--timeout == 0) {
-            GPIO_deInit(trigger_pin);
-            GPIO_deInit(echo_pin);
-            return 0xFFFFFFFF; // timeout error
-        }
+    while (!GPIO_Read(psensorConfig->echo_pin))
+    {
+      if (--timeout == 0)
+      {
+          return 0xFFFFFFFF; // timeout error
+      }
     }
 
     // Start measuring using timer counter
     TIM2_CNT = 0;
-    while (GPIO_Read(echo_pin)) {
-        if (TIM2_CNT > 30000) {  // 30ms timeout
-            GPIO_deInit(trigger_pin);
-            GPIO_deInit(echo_pin);
-            return 0xFFFFFFFF;
-        }
+    while (GPIO_Read(psensorConfig->echo_pin))
+    {
+      if (TIM2_CNT > 30000)
+      {  // 30ms timeout
+        return 0xFFFFFFFF;
+      }
     }
 
     uint32_t echo_time_us = TIM2_CNT;
-
-    GPIO_deInit(trigger_pin);
-    GPIO_deInit(echo_pin);
 
     return echo_time_us;  // in microseconds
 }

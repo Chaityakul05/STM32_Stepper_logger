@@ -20,12 +20,14 @@
 #define TIM2_CNT_OFFSET              (0x24)
 #define TIM2_PSC_OFFSET              (0x28)
 #define TIM2_ARR_OFFSET              (0x2C)
+#define TIM2_EGR_OFFSET              (0x14)
 
 /*------------- TIM2 Register Macros -------------*/
 #define TIM2_CR1   (*(volatile uint32_t*)(TIM2_PERIPHERAL + TIM2_CR1_OFFSET))
 #define TIM2_CNT   (*(volatile uint32_t*)(TIM2_PERIPHERAL + TIM2_CNT_OFFSET))
 #define TIM2_PSC   (*(volatile uint32_t*)(TIM2_PERIPHERAL + TIM2_PSC_OFFSET))
 #define TIM2_ARR   (*(volatile uint32_t*)(TIM2_PERIPHERAL + TIM2_ARR_OFFSET))
+#define TIM2_EGR   (*(volatile uint32_t*)(TIM2_PERIPHERAL + TIM2_EGR_OFFSET))
 
 /*------------- RCC Macros ------------------------*/
 #define RCC_APB1ENR_OFFSET           (0x1C)
@@ -36,7 +38,7 @@
 #define TIM_CR1_CEN                 (1 << 0)  // Counter enable
 
 /*------------- Clock Frequency -------------------*/
-#define SYS_FREQ                    8000000UL  // 16 MHz
+#define SYS_FREQ                    8000000UL  // 8 MHz
 #define TIM2_US_PRESCALER          ((SYS_FREQ / 1000000UL) - 1)
 
 /*------------- Function Prototypes ---------------*/
