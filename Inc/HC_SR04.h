@@ -19,7 +19,8 @@ typedef struct HC_SR04_Config_tag HC_SR04_Config_t;
 /*--------------Function Prototypes------------------*/
 HC_SR04_Config_t* HC_SR04_Init(GPIO_e gpio_base, uint8_t trigger_pin, uint8_t echo_pin);
 uint32_t measureEchoTime(HC_SR04_Config_t* psensorConfig);
-float getDistanceCm(HC_SR04_Config_t* psensorConfig);
+uint32_t getDistanceCm(HC_SR04_Config_t* psensorConfig);
+int getFilteredDistanceInt(HC_SR04_Config_t* psensorConfig, int samples);
 void HC_SR04_deInit(HC_SR04_Config_t* psensorConfig);
 
 

@@ -23,58 +23,46 @@
 #include "usart.h"
 #include "tim_delay.h"
 
-//int main(void)
-//{
-    //usart2_init();
-
-    //while (1)
-    //{
-        //usart2_write('H');
-        //GPIO_Delay(100000);
-        //usart2_write('I');
-        //GPIO_Delay(100000);
-    //}
-//}
-
-
 int main(void)
 {
-  //GPIO_Config_t* check = GPIO_Init(GPIO_A, 7, INPUT, GPIO_RESET);
-  //GPIO_Write(check, GPIO_SET);
+  // Initialize TIM2 for microsecond delays
+  TIM2_Delay_Init();
+  // Initialize USART2 for serial logging
   usart2_init();
   usart2_printf("Stepper + Ultrasonic Logger Start\n");
 
-  //StepperMotor_Config_t* motor = StepperMotor_Init(GPIO_B, 0, 1, 10, 11, 10);
-  HC_SR04_Config_t* sensor = HC_SR04_Init(GPIO_B, 8, 9);
+  // Initialize ultrasonic sensor on GPIOB pins B0 (Trigger) and B1 (Echo)
+  HC_SR04_Config_t* sensor = HC_SR04_Init(GPIO_B, 0, 1);
 
-  const int steps = 10;
+  // Initialize stepper motor on GPIOB pins B10, B11, B12, B13 with 10ms step delay
+  StepperMotor_Config_t* motor = StepperMotor_Init(GPIO_A, 8, 9, 10, 11, 10);
+
+  const int steps = 500;  // Number of steps per scan
 
   for (int i = 0; i < steps; i++)
   {
-    //StepperMotor_StepForward(motor, 1);
-    //GPIO_Delay(20000);
+    // Move stepper motor one step forward
+    StepperMotor_StepForward(motor, 1);
 
-    float distance = getDistanceCm(sensor);
-    usart2_printf("Step %d: %.2f cm\n", i, distance);
-    GPIO_Delay(100000);
+    // Measure distance at current step
+    int distance = getFilteredDistanceInt(sensor, 5);  // Take average of 5 samples
+    if (distance != -1)
+    {
+      usart2_printf("Step %d - Distance: %d cm\n", i, distance);
+    }
+    else
+    {
+      usart2_printf("Step %d - Distance read error\n", i);
+    }
+
+    // Delay between steps
+    GPIO_Delay(2000);
   }
 
-  //StepperMotor_deInit(motor);
+  // Deinitialize sensor and motor
   HC_SR04_deInit(sensor);
+  StepperMotor_deInit(motor);
 
-  while (1);
-
-  //{
-    //if(GPIO_Read(check) == GPIO_SET)
-    //{
-      //usart2_printf("The input is high\n");
-      //GPIO_Delay(10000);
-    //}
-    //else
-    //{
-      //usart2_printf("The input is low\n");
-      //GPIO_Delay(10000);
-    //}
-  //}
+  return 0;
 }
 

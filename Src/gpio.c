@@ -91,9 +91,9 @@ static void configGpioPin(GPIO_Config_t *pConfig)
   }
   else if(pConfig->gpioMode == INPUT)
   {
-    *configReg |= (0x8 << (pin * 4));
-    volatile uint32_t* ODR = gpioBase + (GPIO_ODR_OFFSET / 4);
-    *ODR &= ~(1 << (pConfig->gpioPin));  // pull-down
+    *configReg |= (0x4 << (pin * 4));
+    //volatile uint32_t* ODR = gpioBase + (GPIO_ODR_OFFSET / 4);
+    //*ODR &= ~(1 << (pConfig->gpioPin));  // pull-down
   }
 
 

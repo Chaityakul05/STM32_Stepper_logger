@@ -21,6 +21,7 @@
 #define TIM2_PSC_OFFSET              (0x28)
 #define TIM2_ARR_OFFSET              (0x2C)
 #define TIM2_EGR_OFFSET              (0x14)
+#define TIM2_SR_OFFSET               (0x10)
 
 /*------------- TIM2 Register Macros -------------*/
 #define TIM2_CR1   (*(volatile uint32_t*)(TIM2_PERIPHERAL + TIM2_CR1_OFFSET))
@@ -28,6 +29,7 @@
 #define TIM2_PSC   (*(volatile uint32_t*)(TIM2_PERIPHERAL + TIM2_PSC_OFFSET))
 #define TIM2_ARR   (*(volatile uint32_t*)(TIM2_PERIPHERAL + TIM2_ARR_OFFSET))
 #define TIM2_EGR   (*(volatile uint32_t*)(TIM2_PERIPHERAL + TIM2_EGR_OFFSET))
+#define TIM2_SR    (*(volatile uint32_t*)(TIM2_PERIPHERAL + TIM2_SR_OFFSET))
 
 /*------------- RCC Macros ------------------------*/
 #define RCC_APB1ENR_OFFSET           (0x1C)
@@ -36,6 +38,7 @@
 
 /*------------- CR1 Bit Macros --------------------*/
 #define TIM_CR1_CEN                 (1 << 0)  // Counter enable
+#define TIM_CR1_ARPE                (1 << 7)
 
 /*------------- Clock Frequency -------------------*/
 #define SYS_FREQ                    8000000UL  // 8 MHz
@@ -44,6 +47,9 @@
 /*------------- Function Prototypes ---------------*/
 void TIM2_Delay_Init(void);
 void TIM2_Delay_us(uint32_t us);
+void TIM2_StartCounter(void);
+void TIM2_ResetCounter(void);
+uint32_t TIM2_GetCounter(void);
 
 
 #endif /* TIM_DELAY_H_ */
